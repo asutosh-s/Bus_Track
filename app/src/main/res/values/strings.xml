@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Uber</string>
+    <string name="title_activity_driver_map">Map</string>
+    <string name="todo">TODO</string>
+    <string name="todo1">TODO</string>
+    <string name="swipe_up_to_continue">swipe up to continue</string>
+    <string name="todo2">TODO</string>
+</resources>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient"
+    tools:context=".BaseActivity">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:paddingBottom="250dp">
+
+        <ImageView
+            android:id="@+id/buslogo"
+            android:layout_width="189dp"
+            android:layout_height="205dp"
+            android:clickable="false"
+            app:srcCompat="@drawable/bus_logo"
+            android:contentDescription="@string/todo" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/swipe"
+        android:layout_marginBottom="30dp"
+        android:fontFamily="@font/baveuse"
+        android:text="@string/swipe_up_to_continue"
+        android:layout_centerHorizontal="true"
+        android:textSize="25sp" />
+
+    <ImageView
+        android:id="@+id/swipe"
+        android:layout_width="33dp"
+        android:layout_height="28dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="3dp"
+        android:src="@drawable/swipe_up"
+        android:contentDescription="@string/todo" />
+
+</RelativeLayout>
