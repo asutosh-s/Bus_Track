@@ -37,6 +37,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -305,11 +306,11 @@ public class CustomerMapActivity extends AppCompatActivity implements OnMapReady
 //                        mDriverMarker.remove();
 //                    }
 
-                    for(j=0;j<noOfDriver;++j){
-                        if(mDriverMarker[j]!=null){
-                            mDriverMarker[j].remove();
-                        }
-                    }
+//                    for(j=0;j<noOfDriver;++j){
+//                        if(mDriverMarker[j]!=null){
+//                            mDriverMarker[j].remove();
+//                        }
+//                    }
 
                     Location loc1 = new Location("");
                     loc1.setLatitude(mLastLocation.getLatitude());
@@ -328,7 +329,10 @@ public class CustomerMapActivity extends AppCompatActivity implements OnMapReady
                         getRouteToMarker(driverLatLng);
                     }
                     for(j=0;j<=noOfDriver;++j){
-                        mDriverMarker[j] = mMap.addMarker(new MarkerOptions().position(driverLatLng).title("bus "+currentDriver));
+                        if(mDriverMarker[j]!=null){
+                            mDriverMarker[j].remove();
+                        }
+                        mDriverMarker[j] = mMap.addMarker(new MarkerOptions().position(driverLatLng).title("Bus "+j+1).icon(BitmapDescriptorFactory.fromResource(R.mipmap.bus_icon)));
                     }
                 }
             }
@@ -398,7 +402,7 @@ public class CustomerMapActivity extends AppCompatActivity implements OnMapReady
 
             double dist = route.get(i).getDistanceValue();
             double time = route.get(i).getDurationValue();
-            Toast.makeText(getApplicationContext(),"Distance : "+ dist/1000.0+"km"+":: duration : ",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),"Distance : "+ dist/1000.0+"kms",Toast.LENGTH_SHORT).show();
         }
     }
 
