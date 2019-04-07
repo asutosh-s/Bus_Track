@@ -16,6 +16,13 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.widget.Toast;
 
+import com.akexorcist.googledirection.DirectionCallback;
+import com.akexorcist.googledirection.GoogleDirection;
+import com.akexorcist.googledirection.constant.TransportMode;
+import com.akexorcist.googledirection.model.Direction;
+import com.akexorcist.googledirection.model.Leg;
+import com.akexorcist.googledirection.model.Step;
+import com.akexorcist.googledirection.util.DirectionConverter;
 import com.directions.route.AbstractRouting;
 import com.directions.route.Route;
 import com.directions.route.RouteException;
@@ -39,6 +46,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -51,15 +59,19 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class CustomerMapActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener, RoutingListener {
+public class CustomerMapActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener, RoutingListener, DirectionCallback {
 
     private GoogleMap mMap;
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     public String userID;
     public Marker[] mDriverMarker;
+    private LatLng pickupLocation;
+    private Marker mRiderMarker;
+
 
     private List<Polyline> polylines;
 
@@ -108,20 +120,20 @@ public class CustomerMapActivity extends AppCompatActivity implements OnMapReady
                 double locLat = 0;
                 double locLng = 0;
 
-                for(i=0;i<10;++i) {
+                for(i=0;i<11;++i) {
                     locLat = Double.parseDouble(dataSnapshot.child(stops[i]).child("lat").getValue().toString());
                     locLng = Double.parseDouble(dataSnapshot.child(stops[i]).child("lon").getValue().toString());
                     LatLng startLatLng = new LatLng(locLat, locLng);
 
-                    mMap.addMarker(new MarkerOptions().position(startLatLng).title(stops[i]));
+                    mMap.addMarker(new MarkerOptions().position(startLatLng).title(stops[i]).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_stand)));
 
-                    locLat = Double.parseDouble(dataSnapshot.child(stops[i+1]).child("lat").getValue().toString());
-                    locLng = Double.parseDouble(dataSnapshot.child(stops[i+1]).child("lon").getValue().toString());
-                    LatLng endLatLng = new LatLng(locLat,locLng);
+//                    locLat = Double.parseDouble(dataSnapshot.child(stops[i+1]).child("lat").getValue().toString());
+//                    locLng = Double.parseDouble(dataSnapshot.child(stops[i+1]).child("lon").getValue().toString());
+//                    LatLng endLatLng = new LatLng(locLat,locLng);
+//
+//                    mMap.addMarker(new MarkerOptions().position(endLatLng).title(stops[i+1]).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_stand)));
 
-                    mMap.addMarker(new MarkerOptions().position(endLatLng).title(stops[i+1]));
-
-                    getRoute(startLatLng,endLatLng);
+                    //getRoute(startLatLng,endLatLng);
 
                 }
             }
@@ -148,6 +160,7 @@ public class CustomerMapActivity extends AppCompatActivity implements OnMapReady
         }
         buildGoogleApiClient();
         mMap.setMyLocationEnabled(true);
+        requestDirection();
     }
 
     protected synchronized void buildGoogleApiClient(){
@@ -302,19 +315,16 @@ public class CustomerMapActivity extends AppCompatActivity implements OnMapReady
                         locationLng = Double.parseDouble(map.get(1).toString());
                     }
                     LatLng driverLatLng = new LatLng(locationLat,locationLng);
-//                    if (mDriverMarker != null) {
-//                        mDriverMarker.remove();
-//                    }
-
-//                    for(j=0;j<noOfDriver;++j){
-//                        if(mDriverMarker[j]!=null){
-//                            mDriverMarker[j].remove();
-//                        }
-//                    }
 
                     Location loc1 = new Location("");
                     loc1.setLatitude(mLastLocation.getLatitude());
                     loc1.setLongitude(mLastLocation.getLongitude());
+
+                    pickupLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                    if (mRiderMarker != null) {
+                        mRiderMarker.remove();
+                    }
+                    mRiderMarker = mMap.addMarker(new MarkerOptions().position(pickupLocation).title("Your are here!").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_user)));
 
                     Location loc2 = new Location("");
                     loc2.setLatitude(driverLatLng.latitude);
@@ -332,7 +342,7 @@ public class CustomerMapActivity extends AppCompatActivity implements OnMapReady
                         if(mDriverMarker[j]!=null){
                             mDriverMarker[j].remove();
                         }
-                        mDriverMarker[j] = mMap.addMarker(new MarkerOptions().position(driverLatLng).title("Bus "+j+1).icon(BitmapDescriptorFactory.fromResource(R.mipmap.bus_icon)));
+                        mDriverMarker[j] = mMap.addMarker(new MarkerOptions().position(driverLatLng).title("Bus "+j+1).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_bus)));
                     }
                 }
             }
@@ -381,11 +391,11 @@ public class CustomerMapActivity extends AppCompatActivity implements OnMapReady
 
     @Override
     public void onRoutingSuccess(ArrayList<Route> route, int shortestRouteIndex) {
-//        if(polylines.size()>0) {
-//            for (Polyline poly : polylines) {
-//                poly.remove();
-//            }
-//        }
+        if(polylines.size()>0) {
+            for (Polyline poly : polylines) {
+                poly.remove();
+            }
+        }
         polylines = new ArrayList<>();
         //add route(s) to the map.
         for (int i = 0; i <route.size(); i++) {
@@ -401,7 +411,7 @@ public class CustomerMapActivity extends AppCompatActivity implements OnMapReady
             polylines.add(polyline);
 
             double dist = route.get(i).getDistanceValue();
-            double time = route.get(i).getDurationValue();
+//            double time = route.get(i).getDurationValue();
             Toast.makeText(getApplicationContext(),"Distance : "+ dist/1000.0+"kms",Toast.LENGTH_SHORT).show();
         }
     }
@@ -423,5 +433,63 @@ public class CustomerMapActivity extends AppCompatActivity implements OnMapReady
         Intent callingIntent = new Intent(CustomerMapActivity.this, MainActivity.class);
         startActivity(callingIntent);
         super.onBackPressed();
+    }
+
+    public void requestDirection() {
+//        Snackbar.make(btnRequestDirection, "Direction Requesting...", Snackbar.LENGTH_SHORT).show();
+        List<LatLng> waypoints = Arrays.asList(
+                new LatLng(25.535262, 84.851673),//Admin Block
+                new LatLng(25.540567, 84.851615),//Boy's Hostel
+                new LatLng(25.547983, 84.858946),//Type 'B' quarters
+                new LatLng(25.552066, 84.859553),//Type 'D' quarters
+                new LatLng(25.554656, 84.857486),//Gate 2
+                new LatLng(25.582967, 85.04339),//Danapur
+                new LatLng(25.623005, 85.041389),//Saguna More
+                new LatLng(25.607063, 85.117137),//Hartali More
+                new LatLng(25.616443, 85.113839)//Boring Road
+
+        );
+        GoogleDirection.withServerKey("AIzaSyChf4e0oHOfF-hi_LkPfXFlbWdyrqFnxJg")
+                .from(new LatLng(25.532351, 84.851926))//Block IX
+                .and(waypoints)
+                .to(new LatLng(25.614783, 85.146805))//Patliputra Golambar
+                .transportMode(TransportMode.DRIVING)
+                .execute(this);
+    }
+
+    @Override
+    public void onDirectionSuccess(Direction direction, String rawBody) {
+        if (direction.isOK()) {
+            com.akexorcist.googledirection.model.Route route = direction.getRouteList().get(0);
+//            com.akexorcist.googledirection.model.Route route;
+            int legCount = route.getLegList().size();
+            for (int index = 0; index < legCount; index++) {
+                Leg leg = route.getLegList().get(index);
+                mMap.addMarker(new MarkerOptions().position(leg.getStartLocation().getCoordination()).visible(false));
+                if (index == legCount - 1) {
+                    mMap.addMarker(new MarkerOptions().position(leg.getEndLocation().getCoordination()).visible(false));
+                }
+                List<Step> stepList = leg.getStepList();
+                ArrayList<PolylineOptions> polylineOptionList = DirectionConverter.createTransitPolyline(this, stepList, 3, Color.MAGENTA, 3, Color.BLUE);
+                for (PolylineOptions polylineOption : polylineOptionList) {
+                    mMap.addPolyline(polylineOption);
+                }
+            }
+            setCameraWithCoordinationBounds(route);
+        }
+    }
+
+    private void setCameraWithCoordinationBounds(com.akexorcist.googledirection.model.Route route) {
+        LatLng southwest = route.getBound().getSouthwestCoordination().getCoordination();
+        LatLng northeast = route.getBound().getNortheastCoordination().getCoordination();
+        LatLngBounds bounds = new LatLngBounds(southwest, northeast);
+        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
+
+    }
+
+
+    @Override
+    public void onDirectionFailure(Throwable t) {
+        Toast.makeText(this, "Route failed", Toast.LENGTH_SHORT).show();
     }
 }
