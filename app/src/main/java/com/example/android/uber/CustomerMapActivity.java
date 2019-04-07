@@ -415,8 +415,9 @@ public class CustomerMapActivity extends AppCompatActivity implements OnMapReady
 //            int colorIndex = i % COLORS.length;
 
             PolylineOptions polyOptions = new PolylineOptions();
-            polyOptions.color(Color.parseColor("#66BB6A"));
-            polyOptions.width(10 + i * 3);
+            polyOptions.color(Color.parseColor("#ff6666"));
+            polyOptions.width(20 );
+//            polyOptions.width(10 + i * 3);
             polyOptions.addAll(route.get(i).getPoints());
             Polyline polyline = mMap.addPolyline(polyOptions);
             polylines.add(polyline);
@@ -481,7 +482,7 @@ public class CustomerMapActivity extends AppCompatActivity implements OnMapReady
                     mMap.addMarker(new MarkerOptions().position(leg.getEndLocation().getCoordination()).visible(false));
                 }
                 List<Step> stepList = leg.getStepList();
-                ArrayList<PolylineOptions> polylineOptionList = DirectionConverter.createTransitPolyline(this, stepList, 3, Color.MAGENTA, 3, Color.BLUE);
+                ArrayList<PolylineOptions> polylineOptionList = DirectionConverter.createTransitPolyline(this, stepList, 4, Color.parseColor("#9966ff"), 3, Color.BLUE);
                 for (PolylineOptions polylineOption : polylineOptionList) {
                     mMap.addPolyline(polylineOption);
                 }
