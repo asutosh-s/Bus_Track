@@ -40,6 +40,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -69,9 +70,8 @@ public class CustomerMapActivity extends AppCompatActivity implements OnMapReady
     Location mLastLocation;
     public String userID;
     public Marker[] mDriverMarker;
-    private LatLng pickupLocation;
+    private LatLng pickupLocation, driverLatLng;
     private Marker mRiderMarker;
-
 
     private List<Polyline> polylines;
 
@@ -314,7 +314,7 @@ public class CustomerMapActivity extends AppCompatActivity implements OnMapReady
                     if(map.get(1)!=null){
                         locationLng = Double.parseDouble(map.get(1).toString());
                     }
-                    LatLng driverLatLng = new LatLng(locationLat,locationLng);
+                    driverLatLng = new LatLng(locationLat,locationLng);
 
                     Location loc1 = new Location("");
                     loc1.setLatitude(mLastLocation.getLatitude());
@@ -391,6 +391,17 @@ public class CustomerMapActivity extends AppCompatActivity implements OnMapReady
 
     @Override
     public void onRoutingSuccess(ArrayList<Route> route, int shortestRouteIndex) {
+
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        builder.include(pickupLocation);
+        builder.include(driverLatLng);
+        LatLngBounds bounds = builder.build();
+
+        int width = getResources().getDisplayMetrics().widthPixels;
+        int padding = (int) (width * 0.2);
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+        mMap.animateCamera(cameraUpdate);
+
         if(polylines.size()>0) {
             for (Polyline poly : polylines) {
                 poly.remove();
