@@ -278,12 +278,12 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
                     if (mRiderMarker != null) {
                         mRiderMarker.remove();
                     }
-                    mRiderMarker = mMap.addMarker(new MarkerOptions().position(pickupLocation).title("Your are here!").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_user)));
+                    mRiderMarker = mMap.addMarker(new MarkerOptions().position(pickupLocation).title("Your are here!").icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_user)));
 
                     if (mDriverMarker != null) {
                         mDriverMarker.remove();
                     }
-                    mDriverMarker = mMap.addMarker(new MarkerOptions().position(driverLatLng).title("Bus").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_bus)));
+                    mDriverMarker = mMap.addMarker(new MarkerOptions().position(driverLatLng).title("Bus").icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus)));
 
                     Location loc1 = new Location(" ");
                     loc1.setLatitude(pickupLocation.latitude);
@@ -432,10 +432,10 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
 
             for (int index = 0; index < legCount; index++) {
                 Leg leg = route.getLegList().get(index);
-                mMap.addMarker(new MarkerOptions().title(stops[index]).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_stand)).position(leg.getStartLocation().getCoordination()));
+                mMap.addMarker(new MarkerOptions().title(stops[index]).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_stand)).position(leg.getStartLocation().getCoordination()));
 //                Toast.makeText(this, "number", Toast.LENGTH_SHORT).show();
                 if (index == legCount - 1) {
-                    mMap.addMarker(new MarkerOptions().title(stops[10]).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_stand)).position(leg.getEndLocation().getCoordination()));
+                    mMap.addMarker(new MarkerOptions().title(stops[10])/*.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_stand))*/.position(leg.getEndLocation().getCoordination()));
 
                 }
                 List<Step> stepList = leg.getStepList();
@@ -478,7 +478,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
 
                 LatLng driverLocation = new LatLng(location.latitude, location.longitude);
                 availableBus++;
-                Marker mDriverMarker = mMap.addMarker(new MarkerOptions().position(driverLocation).title("Bus" + availableBus).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_bus)));
+                Marker mDriverMarker = mMap.addMarker(new MarkerOptions().position(driverLocation).title("Bus" + availableBus).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus)));
                 mDriverMarker.setTag(key);
 
                 markerList.add(mDriverMarker);
