@@ -56,7 +56,8 @@
             android:name=".MainActivity"
             android:parentActivityName=".BaseActivity"
             android:theme="@style/MainTheme" />
-        <activity android:name=".Bus_Schedule"></activity>
+        <activity android:name=".Bus_Schedule" />
+        <activity android:name=".FetchbusActivity"></activity>
     </application>
 
 </manifest>

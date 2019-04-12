@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".FetchbusActivity"
+    android:gravity="center">
+
+    <EditText
+        android:id="@+id/BusnoE"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:hint="Enter bus no."/>
+
+    <Button
+        android:id="@+id/SearchB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Search for Bus"
+        android:padding="10dp"
+        android:textSize="15sp"
+        android:background="@drawable/rounded"/>
+
+    <Button
+        android:id="@+id/SearchAllB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:text="Search for all buses"
+        android:layout_margin="20dp"
+        android:background="@drawable/rounded"/>
+
+</LinearLayout>

@@ -140,7 +140,6 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
 
         requestDirection();
 
-
         return;
     }
 
@@ -316,7 +315,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
 
                     float distance = loc1.distanceTo(loc2);
 
-                    if (distance < 100) {
+                    if (distance < 30) {
 //                        Toast.makeText(RiderMapActivity.this, "Bus arrived", Toast.LENGTH_LONG).show();
                         mRequest.setText("Bus Arrived");
                         arrival = true;
@@ -440,10 +439,10 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
 
             for (int index = 0; index < legCount; index++) {
                 Leg leg = route.getLegList().get(index);
-                mMap.addMarker(new MarkerOptions().title(stops[index]).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_stand)).position(leg.getStartLocation().getCoordination()));
+                mMap.addMarker(new MarkerOptions().title(stops[index]).snippet("Bus Stop").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_stand)).position(leg.getStartLocation().getCoordination()));
 //                Toast.makeText(this, "number", Toast.LENGTH_SHORT).show();
                 if (index == legCount - 1) {
-                    mMap.addMarker(new MarkerOptions().title(stops[10]).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_stand)).position(leg.getEndLocation().getCoordination()));
+                    mMap.addMarker(new MarkerOptions().title(stops[10]).snippet("Bus Stop").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_stand)).position(leg.getEndLocation().getCoordination()));
 
                 }
                 List<Step> stepList = leg.getStepList();
