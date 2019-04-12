@@ -2,6 +2,7 @@ package com.example.android.uber;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -66,7 +67,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
     Location mLastLocation;
     LocationRequest mLocationRequest;
 
-    private Button mRequest;
+    private Button mRequest, busSchedule;
     private TextView totalBus;
     private LatLng pickupLocation, driverLatLng;
     private int count = 0, availableBus = 0;
@@ -99,6 +100,13 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
         polylines = new ArrayList<>();
 
         totalBus = (TextView) findViewById(R.id.total_bus);
+        busSchedule = (Button) findViewById(R.id.schedule);
+        busSchedule.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(CustomerMapActivity.this, Bus_Schedule.class));
+            }
+        });
         mRequest = (Button) findViewById(R.id.request);
         mRequest.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -520,46 +528,4 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
         });
     }
 }
-/*
-//function for onMarkerClick route
-mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-
-    @Override
-
-    public boolean onMarkerClick(Marker marker) {
-        LatLng evac=marker.getPosition();
-        MarkerPoints.add(latLng);
-        MarkerPoints.add(evac);
-
-        // Checks, whether start and end locations are captured
-        if (MarkerPoints.size() >= 2) {
-            LatLng origin = MarkerPoints.get(0);
-
-            for (int i=0;i<=getevacarray.size();i++){
-                LatLng Destination = MarkerPoints.get(1);
-                // Getting URL to the Google Directions API
-                String url = getUrl(origin, Destination);
-
-                DownloadTask downloadTask = new DownloadTask();
-                downloadTask.execute(url);
-
-                Log.d("onMapClick", url.toString());
-                FetchUrl FetchUrl = new FetchUrl();
-
-                // Start downloading json data from Google Directions API
-                FetchUrl.execute(url);
-            }
-
-            //move map camera
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(origin));
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
-
-        }
-
-
-        return false;
-    }
-});
-
- */
 
