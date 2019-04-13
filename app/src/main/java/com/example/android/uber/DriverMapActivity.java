@@ -239,6 +239,8 @@ public class DriverMapActivity extends AppCompatActivity implements OnMapReadyCa
                 ref.setValue(true);
                 DatabaseReference mRef = FirebaseDatabase.getInstance().getReference().child("Users").child("DriverActive").child(userId);
                 mRef.removeValue();
+                DatabaseReference nRef = FirebaseDatabase.getInstance().getReference().child("Drivers Data").child(userId);
+                nRef.removeValue();
 
                 FirebaseAuth.getInstance().signOut();
 

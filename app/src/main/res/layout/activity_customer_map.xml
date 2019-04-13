@@ -33,7 +33,21 @@
         android:text="bus schedule"
         android:textColor="#008080"
         android:padding="7dp"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="20dp"
         />
+
+    <EditText
+        android:id="@+id/BusnoE"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:gravity="center"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:padding="15dp"
+        android:hint="Bus no." />
+
 
     <Button
         android:id="@+id/request"
@@ -44,7 +58,8 @@
         android:layout_gravity="bottom"
         android:padding="7dp"
         android:layout_margin="20dp"
-        android:text="find closest bus"/>
+        android:text="find closest bus"
+        android:visibility="gone"/>
 
 
 </FrameLayout>

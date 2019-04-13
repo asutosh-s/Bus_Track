@@ -13,6 +13,7 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -68,9 +69,11 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
     LocationRequest mLocationRequest;
 
     private Button mRequest, busSchedule;
+    private EditText mBusnoE;
     private TextView totalBus;
     private LatLng pickupLocation, driverLatLng;
     private int count = 0, availableBus = 0;
+    private String Busno;
     private SupportMapFragment mapFragment;
     private static String[] stops={"Block IX","Admin Block","Boy's Hostel","Type 'B' quarters","Type 'D' quarters","Gate 2","Danapur","Saguna More","Hartali More","Boring Road","Patliputra Golambar"};
 
@@ -120,6 +123,8 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
             }
         });
 
+        mBusnoE = (EditText) findViewById(R.id.BusnoE);
+        Busno = mBusnoE.getText().toString();
 
     }
 
