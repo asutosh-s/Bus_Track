@@ -125,7 +125,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
 
         mBusnoE = (EditText) findViewById(R.id.BusnoE);
         Busno = mBusnoE.getText().toString();
-
+        Toast.makeText(this, Busno + "not found !!!", Toast.LENGTH_SHORT).show();
     }
 
     @Override
