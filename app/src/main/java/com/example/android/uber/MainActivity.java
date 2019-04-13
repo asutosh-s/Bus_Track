@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
                         mUser.setBackgroundColor(Color.rgb(192,192,192));
                     }
                 }, 500);
-                Intent intent = new Intent(MainActivity.this, FetchbusActivity.class);
+                Intent intent = new Intent(MainActivity.this, CustomerMapActivity.class);
                 startActivity(intent);
             }
         });
