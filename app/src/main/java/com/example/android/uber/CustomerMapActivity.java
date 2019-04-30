@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Adapter;
 import android.widget.AdapterView;
@@ -74,7 +75,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
     Location mLastLocation;
     LocationRequest mLocationRequest;
 
-    private Button mRequest, busSchedule;
+    private Button mRequest, busSchedule, mclickBut;
     private EditText mBusnoE;
     private TextView totalBus;
     private LatLng pickupLocation, driverLatLng;
@@ -130,8 +131,10 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView <? > arg0, View view, int position, long id) {
                 // When clicked, show a toast with the TextView text
-                Toast.makeText(CustomerMapActivity.this, position +"-"+ id, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(CustomerMapActivity.this, position +"-"+ id, Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(CustomerMapActivity.this, BusDetails.class));
                 if(position>=0) {
+
                 }
             }
         });
@@ -159,11 +162,33 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
             }
         });
 
+        mclickBut = findViewById(R.id.clickBut);
+        mclickBut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mBusnoE = (EditText) findViewById(R.id.BusnoE);
+                Busno = mBusnoE.getText().toString();
+                clickRoute(Busno);
+            }
+        });
 //        mBusnoE = (EditText) findViewById(R.id.BusnoE);
 //        Busno = mBusnoE.getText().toString();
 //        Toast.makeText(this, Busno + "not found !!!", Toast.LENGTH_SHORT).show();
     }
 
+    private  void clickRoute(String Busno){
+        for(Marker markerIt : markerList) {
+            if(markerIt.getTitle().equals("Bus" + Busno))
+            {
+                LatLng latLng = markerIt.getPosition();
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(16));
+                return;
+            }
+        }
+    }
+
+    GeoQuery geoQuery1 = null;
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -182,6 +207,51 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
         mMap.setMyLocationEnabled(true);
 
         requestDirection();
+
+
+        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(final Marker marker) {
+
+                DatabaseReference destination = FirebaseDatabase.getInstance().getReference().child("Drivers Data");
+                GeoFire geoFire = new GeoFire(destination);
+                final LatLng source = marker.getPosition();
+                if(geoQuery1!=null)
+                {
+                    geoQuery1.removeAllListeners();
+                }
+                geoQuery1 = geoFire.queryAtLocation(new GeoLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude()), 500);
+                geoQuery1.addGeoQueryEventListener(new GeoQueryEventListener() {
+                    @Override
+                    public void onKeyEntered(String key, GeoLocation location) {
+
+                    }
+
+                    @Override
+                    public void onKeyExited(String key) {
+
+                    }
+
+                    @Override
+                    public void onKeyMoved(String key, GeoLocation location) {
+                        erasePolylines();
+
+                        getRouteToMarker(source);
+                    }
+
+                    @Override
+                    public void onGeoQueryReady() {
+
+                    }
+
+                    @Override
+                    public void onGeoQueryError(DatabaseError error) {
+
+                    }
+                });
+                return false;
+            }
+        });
 
         return;
     }
@@ -328,12 +398,12 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
                     if (mRiderMarker != null) {
                         mRiderMarker.remove();
                     }
-                    mRiderMarker = mMap.addMarker(new MarkerOptions().position(pickupLocation).title("Your are here!").icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_user)));
+                    mRiderMarker = mMap.addMarker(new MarkerOptions().position(pickupLocation).title("Your are here!").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_user)));
 
                     if (mDriverMarker != null) {
                         mDriverMarker.remove();
                     }
-                    mDriverMarker = mMap.addMarker(new MarkerOptions().position(driverLatLng).title("Bus").icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus)));
+                    mDriverMarker = mMap.addMarker(new MarkerOptions().position(driverLatLng).title("Bus").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_bus)));
 
                     Location loc1 = new Location(" ");
                     loc1.setLatitude(pickupLocation.latitude);
@@ -386,16 +456,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
         routing.execute();
 
     }
-//    private void touchRoute(LatLng driverLatLng) {//function for onMarkerRoute
-//        Routing routing = new Routing.Builder()
-//                .travelMode(AbstractRouting.TravelMode.DRIVING)
-//                .key("AIzaSyChf4e0oHOfF-hi_LkPfXFlbWdyrqFnxJg")
-//                .withListener(this)
-//                .alternativeRoutes(false)
-//                .waypoints(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()), driverLatLng)
-//                .build();
-//        routing.execute();
-//    }
+
 
     @Override
     public void onRoutingFailure(RouteException e) {
@@ -482,10 +543,10 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
 
             for (int index = 0; index < legCount; index++) {
                 Leg leg = route.getLegList().get(index);
-                mMap.addMarker(new MarkerOptions().title(stops[index]).snippet("Bus Stop").icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_stand)).position(leg.getStartLocation().getCoordination()));
+                mMap.addMarker(new MarkerOptions().title(stops[index]).snippet("Bus Stop").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_stand)).position(leg.getStartLocation().getCoordination()));
 //                Toast.makeText(this, "number", Toast.LENGTH_SHORT).show();
                 if (index == legCount - 1) {
-                    mMap.addMarker(new MarkerOptions().title(stops[10]).snippet("Bus Stop").icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_stand)).position(leg.getEndLocation().getCoordination()));
+                    mMap.addMarker(new MarkerOptions().title(stops[10]).snippet("Bus Stop").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_stand)).position(leg.getEndLocation().getCoordination()));
 
                 }
                 List<Step> stepList = leg.getStepList();
@@ -527,7 +588,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
 
                 LatLng driverLocation = new LatLng(location.latitude, location.longitude);
                 availableBus++;
-                Marker mDriverMarker = mMap.addMarker(new MarkerOptions().position(driverLocation).title("Bus" + availableBus).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus)));
+                Marker mDriverMarker = mMap.addMarker(new MarkerOptions().position(driverLocation).title("Bus" + availableBus).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_bus)));
                 mDriverMarker.setTag(key);
 
                 markerList.add(mDriverMarker);

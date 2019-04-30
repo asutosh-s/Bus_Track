@@ -37,12 +37,13 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/good_times"
                 android:text="GET2BUS"
+                android:textStyle="bold"
                 android:gravity="center"
                 android:textSize="30dp"
                 android:paddingTop="10dp"
                 android:paddingBottom="10dp"/>
 
-            <LinearLayout
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -52,16 +53,27 @@
                 <EditText
                     android:id="@+id/BusnoE"
                     android:background="@drawable/edittext_color"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="8"
                     android:gravity="center"
+                    android:inputType="textShortMessage"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
                     android:padding="10dp"
-                    android:hint="Bus no."
-                    android:drawableEnd="@drawable/sear" />
-            </LinearLayout>
+                    android:ems="13"
+                    android:hint="Bus no"
+                    android:drawableRight="@drawable/sear" />
+
+                <Button
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:id="@+id/clickBut"
+                    android:layout_marginRight="10dp"
+                    android:text=""
+                    android:layout_gravity="right"
+                    android:background="?android:attr/selectableItemBackground"/>
+
+            </FrameLayout>
 
             <Button
                 android:id="@+id/schedule"
