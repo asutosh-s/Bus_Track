@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.Location;
 import android.support.annotation.NonNull;
@@ -12,8 +13,13 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Adapter;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -81,6 +87,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
     private ProgressDialog progressDialog;
     private Marker mRiderMarker;
     final int LOCATION_REQUEST_CODE = 1;
+    List<Marker> markerList = new ArrayList<Marker>();
 
     private List<Polyline> polylines;
     private static final int[] COLORS = new int[]{R.color.primary_dark_material_light};
@@ -90,15 +97,44 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_map);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
+        View mapView = mapFragment.getView();
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(CustomerMapActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_CODE);
         } else {
             mapFragment.getMapAsync(this);
         }
+
+        //change the position of default location marker
+        if (mapView != null &&
+                mapView.findViewById(Integer.parseInt("1")) != null) {
+            // Get the button view
+            View locationButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+            // and next place it, on bottom right (as Google Maps app)
+            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)
+                    locationButton.getLayoutParams();
+            // position on right bottom
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+            layoutParams.setMargins(0, 0, 30, 30);
+        }
+
+        //adding the ListView
+        ListView listView = findViewById(R.id.ListView);
+        listView.setAdapter(new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,
+                new String[] {"Bus no - 1","Bus no - 2","Bus no - 3"}));
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView <? > arg0, View view, int position, long id) {
+                // When clicked, show a toast with the TextView text
+                Toast.makeText(CustomerMapActivity.this, position +"-"+ id, Toast.LENGTH_SHORT).show();
+                if(position>=0) {
+                }
+            }
+        });
 
         polylines = new ArrayList<>();
 
@@ -123,14 +159,16 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
             }
         });
 
-        mBusnoE = (EditText) findViewById(R.id.BusnoE);
-        Busno = mBusnoE.getText().toString();
-        Toast.makeText(this, Busno + "not found !!!", Toast.LENGTH_SHORT).show();
+//        mBusnoE = (EditText) findViewById(R.id.BusnoE);
+//        Busno = mBusnoE.getText().toString();
+//        Toast.makeText(this, Busno + "not found !!!", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        //disable the direction pointer
+        mMap.getUiSettings().setMapToolbarEnabled(false);
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Loading map...");
         progressDialog.show();
@@ -290,16 +328,16 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
                     if (mRiderMarker != null) {
                         mRiderMarker.remove();
                     }
-                    mRiderMarker = mMap.addMarker(new MarkerOptions().position(pickupLocation).title("Your are here!").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_user)));
+                    mRiderMarker = mMap.addMarker(new MarkerOptions().position(pickupLocation).title("Your are here!").icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_user)));
 
                     if (mDriverMarker != null) {
                         mDriverMarker.remove();
                     }
-                    mDriverMarker = mMap.addMarker(new MarkerOptions().position(driverLatLng).title("Bus").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_bus)));
+                    mDriverMarker = mMap.addMarker(new MarkerOptions().position(driverLatLng).title("Bus").icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus)));
 
                     Location loc1 = new Location(" ");
                     loc1.setLatitude(pickupLocation.latitude);
-                    loc1.setLongitude(pickupLocation.longitude);//pickupLocation.longitude
+                    loc1.setLongitude(pickupLocation.longitude);    //pickupLocation.longitude
 
                     Location loc2 = new Location(" ");
                     loc2.setLatitude(driverLatLng.latitude);
@@ -444,10 +482,10 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
 
             for (int index = 0; index < legCount; index++) {
                 Leg leg = route.getLegList().get(index);
-                mMap.addMarker(new MarkerOptions().title(stops[index]).snippet("Bus Stop").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_stand)).position(leg.getStartLocation().getCoordination()));
+                mMap.addMarker(new MarkerOptions().title(stops[index]).snippet("Bus Stop").icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_stand)).position(leg.getStartLocation().getCoordination()));
 //                Toast.makeText(this, "number", Toast.LENGTH_SHORT).show();
                 if (index == legCount - 1) {
-                    mMap.addMarker(new MarkerOptions().title(stops[10]).snippet("Bus Stop").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_stand)).position(leg.getEndLocation().getCoordination()));
+                    mMap.addMarker(new MarkerOptions().title(stops[10]).snippet("Bus Stop").icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_stand)).position(leg.getEndLocation().getCoordination()));
 
                 }
                 List<Step> stepList = leg.getStepList();
@@ -475,7 +513,6 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
 
     }
 
-    List<Marker> markerList = new ArrayList<Marker>();
     private void getDriversAround() {
         DatabaseReference driversLocation = FirebaseDatabase.getInstance().getReference().child("Drivers Data");
         GeoFire geoFire = new GeoFire(driversLocation);
@@ -490,7 +527,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
 
                 LatLng driverLocation = new LatLng(location.latitude, location.longitude);
                 availableBus++;
-                Marker mDriverMarker = mMap.addMarker(new MarkerOptions().position(driverLocation).title("Bus" + availableBus).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_bus)));
+                Marker mDriverMarker = mMap.addMarker(new MarkerOptions().position(driverLocation).title("Bus" + availableBus).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_bus)));
                 mDriverMarker.setTag(key);
 
                 markerList.add(mDriverMarker);

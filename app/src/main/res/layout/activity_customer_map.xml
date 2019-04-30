@@ -1,65 +1,136 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.sothree.slidinguppanel.SlidingUpPanelLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_height="match_parent"
     android:layout_width="match_parent"
-    >
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".MainActivity"
+    app:umanoDragView="@id/DragView"
+    app:umanoScrollableView="@id/ListView"
+    android:layout_gravity="bottom"
+    android:gravity="bottom"
+    app:umanoPanelHeight="68dp"
+    app:umanoOverlay="false"
+    app:umanoParallaxOffset="100dp"
+    app:umanoShadowHeight="4dp" >
 
-    <fragment
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="match_parent"
+    <FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_height="match_parent"
-        tools:context=".RiderMapActivity" />
+        android:layout_width="match_parent" >
 
-    <TextView
-        android:id="@+id/total_bus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Available Buses"
-        android:background="@drawable/rounded"
-        android:padding="7dp"
-        android:layout_margin="15dp"
-        />
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".RiderMapActivity" />
 
-    <Button
-        android:id="@+id/schedule"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
-        android:layout_marginLeft="15dp"
-        android:background="@drawable/rounded"
-        android:text="bus schedule"
-        android:textColor="#008080"
-        android:padding="7dp"
-        android:layout_gravity="bottom"
-        android:layout_marginBottom="20dp"
-        />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/BusnoE"
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/good_times"
+                android:text="GET2BUS"
+                android:gravity="center"
+                android:textSize="30dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:focusable="true"
+                android:focusableInTouchMode="true">
+
+                <EditText
+                    android:id="@+id/BusnoE"
+                    android:background="@drawable/edittext_color"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="8"
+                    android:gravity="center"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:padding="10dp"
+                    android:hint="Bus no."
+                    android:drawableEnd="@drawable/sear" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/schedule"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/textview_active"
+                android:text="bus schedule"
+                android:textColor="#008080"
+                android:padding="7dp"
+                android:layout_marginBottom="20dp"
+                />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/total_bus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Available Buses"
+            android:background="@drawable/rounded"
+            android:padding="7dp"
+            android:layout_margin="15dp"
+            android:visibility="gone"/>
+
+        <Button
+            android:id="@+id/request"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded"
+            android:textColor="#008080"
+            android:layout_gravity="bottom"
+            android:padding="7dp"
+            android:layout_margin="20dp"
+            android:text="find closest bus"
+            android:visibility="gone"/>
+    </FrameLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
-        android:gravity="center"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:padding="15dp"
-        android:hint="Bus no." />
+        android:id="@+id/DragView"
+        android:clickable="true"
+        android:focusable="false"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:text="Swipe up for Bus Details"
+
+                android:layout_centerInParent="true"/>
+        </RelativeLayout>
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:id="@+id/ListView"
+            android:clickable="true">
 
 
-    <Button
-        android:id="@+id/request"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/rounded"
-        android:textColor="#008080"
-        android:layout_gravity="bottom"
-        android:padding="7dp"
-        android:layout_margin="20dp"
-        android:text="find closest bus"
-        android:visibility="gone"/>
+        </ListView>
+    </LinearLayout>
 
-
-</FrameLayout>
+</com.sothree.slidinguppanel.SlidingUpPanelLayout>
