@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
                 }, 500);
                 Intent intent = new Intent(MainActivity.this, DriverLoginActivity.class);
                 startActivity(intent);
+//                Toast.makeText(MainActivity.this, "Administration permission Required!!", Toast.LENGTH_SHORT).show();
             }
         });
         mUser.setOnClickListener(new View.OnClickListener() {

@@ -88,10 +88,14 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
     private ProgressDialog progressDialog;
     private Marker mRiderMarker;
     final int LOCATION_REQUEST_CODE = 1;
+    private boolean snippet = false;
     List<Marker> markerList = new ArrayList<Marker>();
 
     private List<Polyline> polylines;
     private static final int[] COLORS = new int[]{R.color.primary_dark_material_light};
+
+    private Toast toast = null;
+    private LatLng source;
 
 
     @Override
@@ -207,7 +211,8 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
         mMap.setMyLocationEnabled(true);
 
         requestDirection();
-
+//        LatLng latLng = new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude());
+//        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,16));
 
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
@@ -215,7 +220,20 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
 
                 DatabaseReference destination = FirebaseDatabase.getInstance().getReference().child("Drivers Data");
                 GeoFire geoFire = new GeoFire(destination);
-                final LatLng source = marker.getPosition();
+                source = marker.getPosition();
+                if(marker.getSnippet()!=null)
+                {
+                    snippet = true;
+                }
+                else snippet = false;
+
+                pickupLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                if (mRiderMarker != null) {
+                    mRiderMarker.remove();
+                }
+                mRiderMarker = mMap.addMarker(new MarkerOptions().position(pickupLocation).title("Your are here!").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_user)));
+
+
                 if(geoQuery1!=null)
                 {
                     geoQuery1.removeAllListeners();
@@ -234,10 +252,14 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
 
                     @Override
                     public void onKeyMoved(String key, GeoLocation location) {
-                        erasePolylines();
-
-                        getRouteToMarker(source);
+//                        erasePolylines();
+//
+//                        getRouteToMarker(source);
+                        driverFound = false;
+                        getClosestDriver();
                     }
+
+
 
                     @Override
                     public void onGeoQueryReady() {
@@ -309,7 +331,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
 
     }
 
-    private int radius = 1;
+    private double radius = 0.01;
     private Boolean driverFound = false;
     private String driverFoundId;
 
@@ -324,7 +346,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
 //        DatabaseReference driverLocation = FirebaseDatabase.getInstance().getReference().child("driverAvailable");
 
         GeoFire geoFire = new GeoFire(driverLocation);
-        GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(pickupLocation.latitude, pickupLocation.longitude), radius);
+        GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(source.latitude, source.longitude), radius);
         geoQuery.removeAllListeners();
 
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
@@ -357,12 +379,13 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
                 count++;
                 if(count <500) {
                     if (!driverFound) {
-                        radius++;
+                        radius += 0.01;
                         getClosestDriver();
                     }
                 }
                 else
                 {
+//                    mRequest.setVisibility(View.VISIBLE);
                     mRequest.setText("No bus available!");
                 }
             }
@@ -393,29 +416,29 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
                     if (map.get(1) != null) {
                         locationLng = Double.parseDouble(map.get(1).toString());
                     }
-                    driverLatLng = new LatLng(locationLat, locationLng);
+                    source = new LatLng(locationLat, locationLng);
 
                     if (mRiderMarker != null) {
                         mRiderMarker.remove();
                     }
-                    mRiderMarker = mMap.addMarker(new MarkerOptions().position(pickupLocation).title("Your are here!").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_user)));
+//                    mRiderMarker = mMap.addMarker(new MarkerOptions().position(pickupLocation).title("Your are here!").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_user)));
 
-                    if (mDriverMarker != null) {
-                        mDriverMarker.remove();
-                    }
-                    mDriverMarker = mMap.addMarker(new MarkerOptions().position(driverLatLng).title("Bus").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_bus)));
+//                    if (mDriverMarker != null) {
+//                        mDriverMarker.remove();
+//                    }
+//                    mDriverMarker = mMap.addMarker(new MarkerOptions().position(driverLatLng).title("Bus").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_bus)));
 
                     Location loc1 = new Location(" ");
                     loc1.setLatitude(pickupLocation.latitude);
                     loc1.setLongitude(pickupLocation.longitude);    //pickupLocation.longitude
 
                     Location loc2 = new Location(" ");
-                    loc2.setLatitude(driverLatLng.latitude);
-                    loc2.setLongitude(driverLatLng.longitude);
+                    loc2.setLatitude(source.latitude);
+                    loc2.setLongitude(source.longitude);
 
                     LatLngBounds.Builder builder = new LatLngBounds.Builder();
                     builder.include(pickupLocation);
-                    builder.include(driverLatLng);
+                    builder.include(source);
                     LatLngBounds bounds = builder.build();
 
                     int width = getResources().getDisplayMetrics().widthPixels;
@@ -423,13 +446,25 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
                     CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, padding);
                     mMap.animateCamera(cameraUpdate);
 
-
-                    getRouteToMarker(driverLatLng);
+                    erasePolylines();
+                    getRouteToMarker(source);
 
                     float distance = loc1.distanceTo(loc2);
 
-                    if (distance < 30) {
+                    if (distance < 70) {
 //                        Toast.makeText(RiderMapActivity.this, "Bus arrived", Toast.LENGTH_LONG).show();
+//                        mRequest.setVisibility(View.VISIBLE);
+                        if(toast!=null)
+                        {
+                            toast.cancel();
+                        }
+                        if(snippet==false)
+                        {
+                            toast = Toast.makeText(CustomerMapActivity.this, "Bus arrived", Toast.LENGTH_SHORT);
+                        }
+                        else
+                            toast = Toast.makeText(CustomerMapActivity.this, "Bus Stop arrived", Toast.LENGTH_SHORT);
+                        toast.show();
                         mRequest.setText("Bus Arrived");
                         arrival = true;
                     }
@@ -448,7 +483,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
     private void getRouteToMarker(LatLng driverLatLng) {
         Routing routing = new Routing.Builder()
                 .travelMode(AbstractRouting.TravelMode.DRIVING)
-                .key("AIzaSyCjAoSIAiGhjng-Ol2Ho-ndSAhqvPrFMxY")
+                .key("AIzaSyDg5TWM1HZUZVZ0C8LG5tdehz6Nm-S4694")
                 .withListener(this)
                 .alternativeRoutes(false)
                 .waypoints(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()), driverLatLng)
@@ -494,7 +529,20 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
             polylines.add(polyline);
 
             if (!arrival) {
+                if(toast!=null)
+                {
+                    toast.cancel();
+                }
+                if(snippet==false)
+                {
+                    toast = Toast.makeText(this, "Bus " + route.get(i).getDistanceValue() / 1000.0 + "kms away", Toast.LENGTH_SHORT);
+                }
+                else
+                    toast = Toast.makeText(this, "Bus Stop " + route.get(i).getDistanceValue() / 1000.0 + "kms away", Toast.LENGTH_SHORT);
+                toast.show();
+//                Toast.makeText(this, "Bus " + route.get(i).getDistanceValue() / 1000.0 + "kms away", Toast.LENGTH_SHORT).show();
 //                Toast.makeText(getApplicationContext(), "Bus " + route.get(i).getDistanceValue() / 1000.0 + "kms away", Toast.LENGTH_SHORT).show();
+//                mRequest.setVisibility(View.VISIBLE);
                 mRequest.setText("Bus " + route.get(i).getDistanceValue() / 1000.0 + "kms away");
             }
         }
@@ -526,7 +574,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
                 new LatLng(25.616443, 85.113839)//Boring Road
 
         );
-        GoogleDirection.withServerKey("AIzaSyCjAoSIAiGhjng-Ol2Ho-ndSAhqvPrFMxY")
+        GoogleDirection.withServerKey("AIzaSyDg5TWM1HZUZVZ0C8LG5tdehz6Nm-S4694")
                 .from(new LatLng(25.532351, 84.851926))//Block IX
                 .and(waypoints)
                 .to(new LatLng(25.614783, 85.146805))//Patliputra Golambar
